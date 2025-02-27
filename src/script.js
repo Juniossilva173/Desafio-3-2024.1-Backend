@@ -1,23 +1,38 @@
-//função de mudar imagem pelo id e pela url
-function changeImage(id, url) {
-  document.getElementById(id).src = url;
-}
-//função de mudar texto pelo id e pelo texto
-function changeText(id, text) {
-  document.getElementById(id).innerText = text;
+const pokemonName = document.getElementById("pokemon-name");
+const pokemonImage = document.getElementById("pokemon-image");
+const prevButton = document.getElementById("prev-button");
+const nextButton = document.getElementById("next-button");
+
+let currentPokemonId = 1;
+const totalPokemon = 1026;
+
+async function fetchPokemon(id) {
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        if (!response.ok) {
+            throw new Error("Erro ao buscar Pokémon");
+        }
+        const data = await response.json();
+        updatePokedex(data);
+    } catch (error) {
+        console.error("Erro ao buscar Pokémon:", error);
+    }
 }
 
-// Daqui para baixo voce ira escrever
-// o código para resolver o desafio
-
-function previousPokemon() {
-  alert("Pokemon Anterior");
-  //abra o terminal em inspecionar no chrome para visualizar
-  console.log("Pokemon Anterior");
+function updatePokedex(data) {
+    pokemonName.textContent = data.name.toUpperCase();
+    pokemonImage.src = data.sprites.front_default;
+    pokemonImage.alt = data.name;
 }
 
-function nextPokemon() {
-  alert("Pokemon Seguinte");
-  //abra o terminal em inspecionar no chrome para visualizar
-  console.log("Pokemon Seguinte");
-}
+prevButton.addEventListener("click", () => {
+    currentPokemonId = currentPokemonId === 1 ? totalPokemon - 1 : currentPokemonId - 1;
+    fetchPokemon(currentPokemonId);
+});
+
+nextButton.addEventListener("click", () => {
+    currentPokemonId = currentPokemonId === totalPokemon - 1 ? 1 : currentPokemonId + 1;
+    fetchPokemon(currentPokemonId);
+});
+
+fetchPokemon(currentPokemonId);
